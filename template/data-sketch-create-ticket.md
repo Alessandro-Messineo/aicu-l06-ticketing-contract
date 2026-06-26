@@ -29,15 +29,11 @@ Classificare i dati prima di chiedere codice.
 
 | Campo | Stato | Motivo | Fonte |
 | --- | --- | --- | --- |
-| `title` | accettato / respinto / generato / mancante | [perche'] | issue / contract / decisione / inferenza |
-| `description` | accettato / respinto / generato / mancante | [perche'] | issue / contract / decisione / inferenza |
-| `priority` | accettato / respinto / generato / mancante | [perche'] | issue / contract / decisione / inferenza |
-| `area` | accettato / respinto / generato / mancante | [perche'] | issue / contract / decisione / inferenza |
-| `status` | accettato / respinto / generato / mancante | [perche'] | issue / contract / decisione / inferenza |
-| `id` | accettato / respinto / generato / mancante | [perche'] | issue / contract / decisione / inferenza |
-| `attachments` | accettato / respinto / generato / mancante | [perche'] | issue / contract / decisione / inferenza |
-| `owner` | accettato / respinto / generato / mancante | [perche'] | issue / contract / decisione / inferenza |
-| `createdAt` | accettato / respinto / generato / mancante | [perche'] | issue / contract / decisione / inferenza |
+| `titolo` | accettato | Campo obbligatorio inserito dall'utente per identificare il problema, senza titolo il ticket non e' interpretabile dall'operatore | contract |
+| `descrizione` | accettato | Campo obbligatorio inserito dall'utente per dettagliare il problema; senza descrizione l'operatore non ha contesto | contract |
+| `clienteId` | generato | Identifica il cliente che ha aperto il ticket; necessario per attribuire il ticket a un utente reale | contract |
+| `operatorId` | generato | Identifica l'operatore assegnato al ticket; necessario per l'assegnazione | contract |
+| `createdAt` | generato | Timestamp di creazione assegnato dal sistema al momento del salvataggio | inferenza |
 
 ## Mermaid Leggero
 
@@ -45,27 +41,29 @@ Usa Mermaid solo per visualizzare la relazione minima. Non trasformarlo in schem
 
 ```mermaid
 erDiagram
-  SUPPORT_REQUEST ||--|| TICKET : creates
   TICKET {
-    string id "generato"
+    string titolo "accettato"
+    string descrizione "accettato"
+    string clienteId "generato"
+    string operatorId "generato"
+    datetime createdAt "generato"
   }
 ```
 
 Campi mostrati nel diagramma:
 
-- [campo] - [accettato/generato/respinto/mancante]
-- [campo] - [accettato/generato/respinto/mancante]
+- titolo - accettato
+- descrizione - accettato
+- clienteId - generato
+- operatorId - generato
+- createdAt - generato
 
 ## Campi Scartati O Rimandati
 
 | Campo | Decisione | Motivo |
 | --- | --- | --- |
-| [campo] | respinto / rimandato | [motivo] |
-| [campo] | respinto / rimandato | [motivo] |
-| [campo] | respinto / rimandato | [motivo] |
+| priority | respinto | Non richiesto dalla issue L05 ne' dal contract sketch; nessuna evidenza che serva nel primo slice |
+| area | respinto | Non richiesto dalla issue L05 ne' dal contract sketch; classificazione non prevista |
+| attachments | respinto | La issue L05 esplicitamente vieta di aggiungere campi al ticket (non-goal) |
+| owner | respinto | `clienteId` copre gia' la relazione di ownership del ticket |
 
-## Domande Per L07
-
-- [quale file potrebbe contenere questi dati?]
-- [quale naming andra' verificato nella repo?]
-- [quale campo dipende da una decisione non presa?]

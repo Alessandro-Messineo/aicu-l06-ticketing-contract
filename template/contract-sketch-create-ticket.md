@@ -31,91 +31,105 @@ Serve creare ticket dal supporto.
 
 | Superficie | Cosa riguarda | Nota |
 | --- | --- | --- |
-| UI | [cosa inserisce o vede l'utente] | [nota] |
-| API / azione | [input e output attesi] | [nota] |
-| Dati | [campi conservati o generati] | [nota] |
-| Verifica | [come controlli il comportamento] | [nota] |
+| UI | L'utente vede un form per la creazione del ticket con dei campi del tipo titolo, descrizione | [nota] |
+| API / azione | chiamata di tipo POST quando il form sarà inviato | [nota] |
+| Dati | id, description, user, operator| [nota] |
+| Verifica | verificare che il ticket venga creato correttamente e sia visibile nell'elenco dei ticket e contenga tutti i dati inseriti. | [nota] |
 
 ## Action
 
 Per questo slice, `create ticket` significa:
 
 ```txt
-[scrivi una decisione minima e verificabile]
+un utente compila i campi e invia il form e viene generato il ticket che sarà salvato nel db e visualizzato dall'operatore
 ```
 
 ## Payload Valido
 
 ```json
 {
+    "titolo": "Problema di accesso", 
+    "descrizione": "L'utente non riesce ad accedere al portale.", 
+    "clienteId": "12345",
+    "operatorId": "111"
 }
 ```
 
 Perche' e' valido:
 
-- [motivo 1]
-- [motivo 2]
+- contiene i campi minimi per leggere e capire il problema dell'utente
+- contiene i campi per riconoscere l'utente che l'ha creato e l'operatore a cui è stato assegnato
 
 ## Risposta Attesa Di Successo
 
 ```txt
-[status o risultato atteso]
+201 Created
 ```
 
 Campi attesi:
 
-- [campo generato o restituito]
-- [campo confermato]
+- titolo confermato
+- descrizione confermata
+- clienteId generati
+- operatorId generati
 
 ## Payload Invalido 1
 
 ```json
 {
+    "titolo": "",
+    "descrizione": "",
+    "clienteId": "12345",
+    "operatorId": "111"
 }
 ```
 
 Motivo del rifiuto:
 
 ```txt
-[perche' e' invalido]
+campi titolo e descrizione sono stringhe vuote pertanto non è possibile risalire al problema dell'utente
 ```
 
 Risposta attesa:
 
 ```txt
-[status o errore atteso]
+400 Bad Request — errore di validazione su titolo e descrizione
 ```
 
 ## Payload Invalido 2
 
 ```json
 {
+    "titolo": "Problema di accesso", 
+    "descrizione": "L'utente non riesce ad accedere al portale.", 
+    "clienteId": "",
+    "operatorId": "111"
 }
 ```
 
 Motivo del rifiuto:
 
 ```txt
-[perche' e' invalido]
+clienteId è vuoto quindi non è possibile attribuite il ticket a un utente reale
 ```
 
 Risposta attesa:
 
 ```txt
-[status o errore atteso]
+400 Bad Request — campo clienteId vuoto
 ```
 
 ## Error Model Minimo
 
 | Caso | Motivo | Risposta attesa |
 | --- | --- | --- |
-| Campo richiesto mancante o vuoto | [motivo] | [errore] |
-| Valore fuori contratto | [motivo] | [errore] |
+| Campo richiesto mancante o vuoto | Il ticket senza titolo o descrizione non e' interpretabile dall'operatore; senza clienteId o operatorId non e' attribuibile | 400 Bad Request — campi vuoti |
+| Valore fuori contratto | clienteId o operatorId non corrispondono a un record esistente nel db | 400-422|
+| Backend non raggiungibile o errore di rete | Il servizio backend non risponde (timeout, connection refused, DNS) — il ticket non puo' essere creato | Errore visibile all'utente (es. messaggio "Servizio non disponibile"), nessun crash, nessuno stato inconsistente |
 
 ## Non-Goals Confermati
 
-- [cosa resta fuori scope]
-- [cosa non chiedere all'AI]
-- [cosa rimandare]
+- autenticazione e autorizzazione 
+- modifica, cancellazione del ticket
 
 
